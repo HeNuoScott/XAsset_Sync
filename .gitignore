@@ -1,10 +1,13 @@
 /[Ll]ibrary/
 /[Tt]emp/
 /[Oo]bj/
+/[Ll]ogs/
 /[Bb]uild/
 /[Bb]uilds/
 /[Bb]undles/
+/Assets/StreamingAssets*
 /Assets/AssetStoreTools*
+
 
 # Visual Studio 2015 cache directory
 /.vs/

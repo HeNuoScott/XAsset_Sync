@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace xasset.editor
 {
-    [CreateAssetMenu(menuName = "xasset/Settings", fileName = "Settings", order = 0)]
+    [CreateAssetMenu(menuName = "XAsset/Settings", fileName = "Settings", order = 100)]
     public sealed class Settings : ScriptableObject
     {
         public static string BundleExtension { get; set; } = ".bundle";
@@ -14,22 +14,25 @@ namespace xasset.editor
         /// <summary>
         ///     采集资源或依赖需要过滤掉的文件
         /// </summary>
-        [Header("Bundle")] [Tooltip("采集资源或依赖需要过滤掉的文件")]
+        [Header("Bundle")]
+        [Tooltip("采集资源或依赖需要过滤掉的文件")]
         public List<string> excludeFiles =
             new List<string>
             {
                 ".spriteatlas",
                 ".giparams",
                 "LightingData.asset"
-            }; 
+            };
 
         /// <summary>
         ///     播放器的运行模式。Preload 模式不更新资源，并且打包的时候会忽略分包配置。
         /// </summary>
-        [Tooltip("播放器的运行模式")] public ScriptPlayMode scriptPlayMode = ScriptPlayMode.Simulation;
+        [Header("PlayMode")]
+        [Tooltip("播放器的运行模式")] 
+        public ScriptPlayMode scriptPlayMode = ScriptPlayMode.Simulation;
 
-        public bool requestCopy; 
- 
+        public bool requestCopy;
+
         public static List<string> ExcludeFiles { get; private set; }
 
         /// <summary>
@@ -115,4 +118,44 @@ namespace xasset.editor
             return set.ToArray();
         }
     }
+
+
+#if UNITY_EDITOR
+    [CustomEditor(typeof(Settings))]
+    public class SettingsEditor : Editor
+    {
+        GUIStyle style;
+
+        private void Awake()
+        {
+            style = new GUIStyle();
+            style.alignment = TextAnchor.MiddleCenter;
+            style.fontSize = 16;
+            style.fontStyle = FontStyle.Bold;
+            //<color=#00ffffff>text</color>
+            style.richText = true;
+        }
+
+        public override void OnInspectorGUI()
+        {
+            Settings settings = Settings.GetDefaultSettings();
+            string label = "";
+            switch (settings.scriptPlayMode)
+            {
+                case ScriptPlayMode.Simulation:
+                    label = "<color=#00ff00>仿真模式，可以不打包快速运行，不触发版本更新</color>";
+                    break;
+                case ScriptPlayMode.Preload:
+                    label = "<color=#ffff00>预加载模式，需要先打包，不触发版本更新</color>";
+                    break;
+                case ScriptPlayMode.Increment:
+                    label = "<color=#ffff00>增量模式，需要先打包，可以在编辑器调试真机热更加载逻辑</color>";
+                    break;
+                default: break;
+            }
+            GUILayout.Label(label, style);
+            base.OnInspectorGUI();
+        }
+    }
+#endif
 }
